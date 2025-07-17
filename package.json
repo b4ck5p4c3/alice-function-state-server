@@ -1,0 +1,22 @@
+{
+  "name": "alice-function-state-server",
+  "version": "1.0.0",
+  "description": "Function and State server for Alice",
+  "main": "src/main.ts",
+  "repository": "https://github.com/b4ck5p4c3/alice-function-state-server",
+  "author": "radioegor146",
+  "license": "MIT",
+  "scripts": {
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mqtt": "^5.13.2",
+    "tslog": "^4.9.3",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "zod": "^4.0.5"
+  }
+}

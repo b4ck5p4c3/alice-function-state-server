@@ -26,6 +26,8 @@ export function getStateProviders(params: ProvidersParams): Record<string, State
         }));
     add(providers, new MQTTStateProvider("current_main_lights_state",
         "current state of lights (on or off)", params.mqttClient, "bus/services/alice/state/main_lights"));
+    add(providers, new MQTTStateProvider("current_hack_lights_state",
+        "current state of lights (on or off)", params.mqttClient, "bus/services/alice/state/hack_lights"));
 
     return providers;
 }
@@ -47,7 +49,20 @@ export function getFunctionProviders(params: ProvidersParams): Record<string, Fu
                 value: 1
             }]
         }
-    }, params.mqttClient, "bus/services/alice/function/set_main_lights"));
+    }, params.mqttClient, "bus/services/alice/function/set_hack_lights"));
+    add(providers, new StatefulMQTTFunctionProvider("set_hack_lights_state", "set state of hack lights (on or off)", {
+        description: "lights state",
+        constraints: {
+            type: "variants",
+            variants: [{
+                description: "off",
+                value: 0
+            }, {
+                description: "on",
+                value: 1
+            }]
+        }
+    }, params.mqttClient, "bus/services/alice/function/set_hack_lights"));
 
     return providers;
 }

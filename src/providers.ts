@@ -5,14 +5,25 @@ import {MqttClient} from "mqtt";
 import {StatelessMQTTFunctionProvider} from "./function-provider/stateless-mqtt";
 import {StatefulMQTTFunctionProvider} from "./function-provider/stateful-mqtt";
 import {MQTTStateProvider} from "./state-provider/mqtt";
+import {HTTPJSONStateProvider} from "./state-provider/http-json";
 
 interface ProvidersParams {
-    mqttClient: MqttClient
+    mqttClient: MqttClient;
+    yncaNowPlayingEndpoint: string;
 }
 
 export function getStateProviders(params: ProvidersParams): Record<string, StateProvider> {
     const providers: Record<string, StateProvider> = {};
 
+    add(providers, new HTTPJSONStateProvider("current_playing_track", "current playing music track",
+        params.yncaNowPlayingEndpoint, data => {
+            if ((!data.media.album || data.media.album == "N/A") &&
+                (!data.media.artist || data.media.artist == "N/A") &&
+                (!data.media.title || data.media.title == "N/A")) {
+                return "nothing is playing right now";
+            }
+            return `${data.media.artist} - ${data.media.title}`;
+        }));
     add(providers, new MQTTStateProvider("current_main_lights_state",
         "current state of lights (on or off)", params.mqttClient, "bus/services/alice/state/main_lights"));
 

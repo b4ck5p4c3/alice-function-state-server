@@ -17,6 +17,7 @@ const PORT = parseInt(process.env.PORT || "8080");
 
 const MQTT_URL = process.env.MQTT_URL ?? "mqtts://alice:alice@mqtt.svc.bksp.in:8883";
 const MQTT_CA_CERTIFICATE_PATH = process.env.MQTT_CA_CERTIFICATE_PATH ?? "ca-cert.pem";
+const YNCA_NOW_PLAYING_ENDPOINT = process.env.YNCA_NOW_PLAYING_ENDPOINT ?? "http://localhost:8015/now-playing";
 
 const mqttClient = mqtt.connect(MQTT_URL, {
     ca: [fs.readFileSync(MQTT_CA_CERTIFICATE_PATH)]
@@ -32,7 +33,8 @@ const app = express();
 app.use(express.json());
 
 const params = {
-    mqttClient
+    mqttClient,
+    yncaNowPlayingEndpoint: YNCA_NOW_PLAYING_ENDPOINT
 };
 
 const stateProviders = getStateProviders(params);

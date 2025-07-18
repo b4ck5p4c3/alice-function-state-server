@@ -1,0 +1,45 @@
+stateProviders:
+  current_playing_track:
+    type: ynca-now-playing
+    description: current playing music track
+    url: http://appserver.int.bksp.in:18015/now-playing
+  current_main_lights_state:
+    type: mqtt
+    description: current state of main lights (on or off)
+    topic: bus/services/alice/state/main_lights
+  current_hack_lights_state:
+    type: mqtt
+    description: current state of hack lights (on or off)
+    topic: bus/services/alice/state/hack_lights
+functionProviders:
+  open_door:
+    type: stateless-mqtt
+    description: opens the door
+    topic: bus/services/alice/function/open_door
+    value: "1"
+  set_main_lights_state:
+    type: stateful-mqtt
+    description: set state of main lights (on or off)
+    stateArgument:
+      description: lights state
+      constraints:
+        type: variants
+        variants:
+          - description: off
+            value: 0
+          - description: on
+            value: 1
+    topic: bus/services/alice/function/set_main_lights
+  set_hack_lights_state:
+    type: stateful-mqtt
+    description: set state of hack lights (on or off)
+    stateArgument:
+      description: lights state
+      constraints:
+        type: variants
+        variants:
+          - description: off
+            value: 0
+          - description: on
+            value: 1
+    topic: bus/services/alice/function/set_hack_lights

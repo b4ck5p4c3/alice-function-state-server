@@ -1,3 +1,5 @@
+import z from "zod";
+
 export interface FunctionArgumentValueMinMaxConstraints {
     type: "min-max"
     min: number;
@@ -20,6 +22,15 @@ export interface FunctionArgument {
     description: string;
     constraints: FunctionArgumentValueConstraints;
 }
+
+export interface FunctionProviderConfig {
+    name: string;
+    description: string;
+}
+
+export const configValidator = z.object({
+    description: z.string()
+});
 
 export abstract class FunctionProvider {
     protected constructor(private readonly name: string, private readonly description: string,

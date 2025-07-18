@@ -1,4 +1,13 @@
-import {StateProvider} from "./types";
+import {StateProvider, StateProviderConfig, configValidator as baseConfigValidator} from "./types";
+import z from "zod";
+
+export interface HTTPJSONStateProviderConfig extends StateProviderConfig {
+    url: string;
+}
+
+export const configValidator = z.intersection(z.object({
+    url: z.string()
+}), baseConfigValidator);
 
 export class HTTPJSONStateProvider extends StateProvider {
     constructor(name: string, description: string,

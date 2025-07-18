@@ -2,9 +2,24 @@ import express from "express";
 import dotenv from "dotenv";
 import {getLogger} from "./logger";
 import z from "zod";
-import {getFunctionProviders, getStateProviders} from "./providers";
-import mqtt from "mqtt";
+import mqtt, {MqttClient} from "mqtt";
 import fs from "fs";
+import {StateProvider} from "./state-provider/types";
+import {MQTTStateProvider, configValidator as mqttStateProviderConfigValidator} from "./state-provider/mqtt";
+import {
+    YncaNowPlayingStateProvider,
+    configValidator as yncaNowPlayingStateProviderConfigValidator
+} from "./state-provider/ynca-now-playing";
+import {FunctionProvider} from "./function-provider/types";
+import {
+    StatelessMQTTFunctionProvider,
+    configValidator as statelessMqttFunctionProviderConfigValidator
+} from "./function-provider/stateless-mqtt";
+import {
+    StatefulMQTTFunctionProvider,
+    configValidator as statefulMqttFunctionProviderConfigValidator
+} from "./function-provider/stateful-mqtt";
+import {parse} from "yaml";
 
 const logger = getLogger();
 
@@ -17,7 +32,47 @@ const PORT = parseInt(process.env.PORT || "8080");
 
 const MQTT_URL = process.env.MQTT_URL ?? "mqtts://alice:alice@mqtt.svc.bksp.in:8883";
 const MQTT_CA_CERTIFICATE_PATH = process.env.MQTT_CA_CERTIFICATE_PATH ?? "ca-cert.pem";
+
 const YNCA_NOW_PLAYING_ENDPOINT = process.env.YNCA_NOW_PLAYING_ENDPOINT ?? "http://localhost:8015/now-playing";
+
+const CONFIG_PATH = process.env.CONFIG_PATH ?? "config.yaml";
+
+interface AllDependencies {
+    mqtt: MqttClient;
+}
+
+const stateProviderFactories: Record<string, [z.ZodType,
+    (config: any, dependencies: AllDependencies) => StateProvider]> = {
+    "mqtt": [mqttStateProviderConfigValidator, MQTTStateProvider.create],
+    "ynca-now-playing": [yncaNowPlayingStateProviderConfigValidator, YncaNowPlayingStateProvider.create]
+};
+
+const functionProviderFactories: Record<string, [z.ZodType,
+    (config: any, dependencies: AllDependencies) => FunctionProvider]> = {
+    "stateless-mqtt": [statelessMqttFunctionProviderConfigValidator, StatelessMQTTFunctionProvider.create],
+    "stateful-mqtt": [statefulMqttFunctionProviderConfigValidator, StatefulMQTTFunctionProvider.create]
+};
+
+const stateProviderConfigs = z.union(Object.entries(stateProviderFactories).map((
+    [key, [configValidator, factory]]) => {
+    return z.intersection(z.object({
+        type: z.literal(key)
+    }), configValidator);
+}));
+
+const functionProviderConfigs = z.union(Object.entries(functionProviderFactories).map((
+    [key, [configValidator, factory]]) => {
+    return z.intersection(z.object({
+        type: z.literal(key)
+    }), configValidator);
+}));
+
+const configType = z.object({
+    stateProviders: z.record(z.string(), stateProviderConfigs),
+    functionProviders: z.record(z.string(), functionProviderConfigs)
+});
+
+const config = configType.parse(parse(fs.readFileSync(CONFIG_PATH).toString("utf8")));
 
 const mqttClient = mqtt.connect(MQTT_URL, {
     ca: [fs.readFileSync(MQTT_CA_CERTIFICATE_PATH)]
@@ -32,13 +87,29 @@ mqttClient.on("error", e => {
 const app = express();
 app.use(express.json());
 
-const params = {
-    mqttClient,
-    yncaNowPlayingEndpoint: YNCA_NOW_PLAYING_ENDPOINT
+const dependencies: AllDependencies = {
+    mqtt: mqttClient
 };
 
-const stateProviders = getStateProviders(params);
-const functionProviders = getFunctionProviders(params);
+const stateProviders: Record<string, StateProvider> = {};
+for (const [name, providerConfig] of Object.entries(config.stateProviders)) {
+    const [configValidator, factory] = stateProviderFactories[providerConfig.type];
+    stateProviders[name] = factory({
+        ...(configValidator.parse(providerConfig) as object),
+        name
+    }, dependencies);
+    logger.info(`Registered '${name}' state provider`);
+}
+
+const functionProviders: Record<string, FunctionProvider> = {};
+for (const [name, providerConfig] of Object.entries(config.functionProviders)) {
+    const [configValidator, factory] = functionProviderFactories[providerConfig.type];
+    functionProviders[name] = factory({
+        ...(configValidator.parse(providerConfig) as object),
+        name
+    }, dependencies);
+    logger.info(`Registered '${name}' function provider`);
+}
 
 app.get("/state", (req, res) => {
     (async () => {

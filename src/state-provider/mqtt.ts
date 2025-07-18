@@ -1,7 +1,10 @@
 import {StateProvider} from "./types";
 import {MqttClient} from "mqtt";
+import {getLogger} from "../logger";
 
 export class MQTTStateProvider extends StateProvider {
+    private readonly logger = getLogger<MQTTStateProvider>();
+
     private state: string = "unknown";
 
     constructor(name: string, description: string,
@@ -13,7 +16,9 @@ export class MQTTStateProvider extends StateProvider {
             if (topic !== this.topic) {
                 return;
             }
-            this.state = payload.toString("utf8");
+            const value = payload.toString("utf8")
+            this.logger.info(`Received from '${this.topic}' '${value}'`);
+            this.state = value;
         });
     }
 

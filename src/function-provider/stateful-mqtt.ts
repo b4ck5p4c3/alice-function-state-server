@@ -3,7 +3,7 @@ import {MqttClient} from "mqtt";
 import {getLogger} from "../logger";
 
 export class StatefulMQTTFunctionProvider extends FunctionProvider {
-    private readonly logger = getLogger();
+    private readonly logger = getLogger<StatefulMQTTFunctionProvider>();
 
     constructor(name: string, description: string,
                 stateArgument: FunctionArgument,
@@ -19,6 +19,8 @@ export class StatefulMQTTFunctionProvider extends FunctionProvider {
             this.logger.warn(`Called '${this.getName()}' but without state`);
             return;
         }
-        await this.mqtt.publishAsync(this.topic, argumentValues["state"].toString());
+        const value = argumentValues["state"].toString();
+        await this.mqtt.publishAsync(this.topic, value);
+        this.logger.info(`Sent to '${this.topic}' '${value}'`);
     }
 }

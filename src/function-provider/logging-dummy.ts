@@ -2,7 +2,7 @@ import {FunctionArgument, FunctionProvider} from "./types";
 import {getLogger} from "../logger";
 
 export class LoggingDummyFunctionProvider extends FunctionProvider {
-    private readonly logger = getLogger();
+    private readonly logger = getLogger<LoggingDummyFunctionProvider>();
 
     constructor(name: string, description: string,
                 functionArguments: Record<string, FunctionArgument>) {

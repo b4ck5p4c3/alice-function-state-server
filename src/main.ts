@@ -33,8 +33,6 @@ const PORT = parseInt(process.env.PORT || "8080");
 const MQTT_URL = process.env.MQTT_URL ?? "mqtts://alice:alice@mqtt.svc.bksp.in:8883";
 const MQTT_CA_CERTIFICATE_PATH = process.env.MQTT_CA_CERTIFICATE_PATH ?? "ca-cert.pem";
 
-const YNCA_NOW_PLAYING_ENDPOINT = process.env.YNCA_NOW_PLAYING_ENDPOINT ?? "http://localhost:8015/now-playing";
-
 const CONFIG_PATH = process.env.CONFIG_PATH ?? "config.yaml";
 
 interface AllDependencies {

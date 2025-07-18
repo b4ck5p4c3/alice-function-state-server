@@ -25,9 +25,9 @@ functionProviders:
       constraints:
         type: variants
         variants:
-          - description: off
+          - description: "off"
             value: 0
-          - description: on
+          - description: "on"
             value: 1
     topic: bus/services/alice/function/set_main_lights
   set_hack_lights_state:
@@ -38,8 +38,8 @@ functionProviders:
       constraints:
         type: variants
         variants:
-          - description: off
+          - description: "off"
             value: 0
-          - description: on
+          - description: "on"
             value: 1
     topic: bus/services/alice/function/set_hack_lights

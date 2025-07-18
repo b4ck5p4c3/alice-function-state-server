@@ -49,7 +49,7 @@ export function getFunctionProviders(params: ProvidersParams): Record<string, Fu
                 value: 1
             }]
         }
-    }, params.mqttClient, "bus/services/alice/function/set_hack_lights"));
+    }, params.mqttClient, "bus/services/alice/function/set_main_lights"));
     add(providers, new StatefulMQTTFunctionProvider("set_hack_lights_state", "set state of hack lights (on or off)", {
         description: "lights state",
         constraints: {

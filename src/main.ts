@@ -89,6 +89,7 @@ const functionCallType = z.object({
 app.post("/functions", (req, res) => {
     const body = functionCallType.parse(req.body);
     const calledFunction = functionProviders[body.name];
+    logger.info(`Called function '${body.name}' with ${JSON.stringify(body)}`);
     calledFunction.invoke(body.parameters)
         .then(() => {
             res.status(200).json({})

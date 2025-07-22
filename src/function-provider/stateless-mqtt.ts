@@ -20,8 +20,8 @@ export const configValidator = z.intersection(z.object({
 export class StatelessMQTTFunctionProvider extends FunctionProvider {
     static create(config: StatelessMQTTFunctionProviderConfig,
                          dependencies: StatelessMQTTFunctionProviderDependencies): StatelessMQTTFunctionProvider {
-        return new StatelessMQTTFunctionProvider(config.name, config.value, dependencies.mqtt,
-            config.topic, config.description);
+        return new StatelessMQTTFunctionProvider(config.name, config.description, dependencies.mqtt,
+            config.topic, config.value);
     }
 
     private readonly logger = getLogger<StatelessMQTTFunctionProvider>();

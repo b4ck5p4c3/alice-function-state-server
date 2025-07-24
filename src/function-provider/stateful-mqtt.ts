@@ -23,12 +23,14 @@ export const configValidator = z.intersection(z.object({
         description: z.string(),
         constraints: z.discriminatedUnion("type", [
             z.object({
-                type: z.literal("min-max"),
+                type: z.literal("number-min-max"),
+                argumentType: z.literal("number"),
                 min: z.number(),
                 max: z.number()
             }),
             z.object({
-                type: z.literal("variants"),
+                type: z.literal("number-variants"),
+                argumentType: z.literal("number"),
                 variants: z.array(z.object({
                     description: z.string(),
                     value: z.number()

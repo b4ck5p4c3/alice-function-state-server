@@ -1,13 +1,15 @@
 import z from "zod";
 
 export interface FunctionArgumentValueMinMaxConstraints {
-    type: "min-max"
+    type: "number-min-max";
+    argumentType: "number";
     min: number;
     max: number;
 }
 
 export interface FunctionArgumentValueVariantsConstraints {
-    type: "variants"
+    type: "number-variants";
+    argumentType: "number";
     variants: {
         value: number;
         description: string;

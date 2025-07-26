@@ -109,7 +109,7 @@ for (const [name, providerConfig] of Object.entries(config.functionProviders)) {
     logger.info(`Registered '${name}' function provider`);
 }
 
-app.get("/state", (req, res) => {
+app.post("/state", (req, res) => {
     (async () => {
         const promises: Promise<[string, {
             description: string,
@@ -140,7 +140,7 @@ app.get("/state", (req, res) => {
     })
 });
 
-app.get("/functions", (req, res) => {
+app.post("/functions", (req, res) => {
     res.status(200).json(Object.fromEntries(Object.entries(functionProviders)
         .map(([name, provider]) => {
             return [name, {
@@ -155,7 +155,7 @@ const functionCallType = z.object({
     parameters: z.record(z.string(), z.number())
 });
 
-app.post("/functions", (req, res) => {
+app.patch("/functions", (req, res) => {
     const body = functionCallType.parse(req.body);
     const calledFunction = functionProviders[body.name];
     logger.info(`Called function '${body.name}' with ${JSON.stringify(body)}`);

@@ -20,6 +20,10 @@ import {
     configValidator as statefulMqttFunctionProviderConfigValidator
 } from "./function-provider/stateful-mqtt";
 import {parse} from "yaml";
+import {
+    MoonrakerStatusStateProvider,
+    configValidator as moonrakerStatusStateProviderConfigValidator
+} from "./state-provider/moonraker-status";
 
 const logger = getLogger();
 
@@ -42,7 +46,8 @@ interface AllDependencies {
 const stateProviderFactories: Record<string, [z.ZodType,
     (config: any, dependencies: AllDependencies) => StateProvider]> = {
     "mqtt": [mqttStateProviderConfigValidator, MQTTStateProvider.create],
-    "ynca-now-playing": [yncaNowPlayingStateProviderConfigValidator, YncaNowPlayingStateProvider.create]
+    "ynca-now-playing": [yncaNowPlayingStateProviderConfigValidator, YncaNowPlayingStateProvider.create],
+    "moonraker-status": [moonrakerStatusStateProviderConfigValidator, MoonrakerStatusStateProvider.create]
 };
 
 const functionProviderFactories: Record<string, [z.ZodType,

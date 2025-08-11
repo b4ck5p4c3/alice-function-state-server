@@ -44,7 +44,9 @@ export class MoonrakerStatusStateProvider extends StateProvider {
     }
 
     private async getBasePrinterInfo(): Promise<BasePrinterInfo> {
-        return await (await fetch(`${this.baseUrl}/printer/info`)).json();
+        return await (await fetch(`${this.baseUrl}/printer/info`, {
+            signal: AbortSignal.timeout(500)
+        })).json();
     }
 
     private async getPrintStatsAndVirtualSDCardStatus(): Promise<PrintStatsAndVirtualSDCardStatus> {
@@ -58,7 +60,8 @@ export class MoonrakerStatusStateProvider extends StateProvider {
             }),
             headers: {
                 "content-type": "application/json"
-            }
+            },
+            signal: AbortSignal.timeout(500)
         })).json();
     }
 

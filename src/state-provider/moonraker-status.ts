@@ -89,13 +89,13 @@ export class MoonrakerStatusStateProvider extends StateProvider {
                 }
                 switch (status.result.status.print_stats.state) {
                     case "standby":
-                        return "machine is ready and in standby";
+                        return "machine is in standby";
                     case "printing":
-                        return `machine is ready and working and completed ${
+                        return `machine is working and completed ${
                             Math.round(status.result.status.virtual_sdcard.progress * 100)}% of job '${
                             status.result.status.print_stats.filename}'`;
                     case "paused":
-                        return `machine is ready and on pause for job '${
+                        return `machine is on pause for job '${
                             status.result.status.print_stats.filename}'`;
                     case "complete":
                         return `machine is ready and last job '${
